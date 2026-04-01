@@ -185,6 +185,8 @@ const TechStack = () => {
         return tex;
     }, []);
 
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <section className="techstack-section" id="techstack">
       <div className="techstack-header" style={{ pointerEvents: 'none', position: 'absolute', top: '10%' }}>
@@ -203,15 +205,15 @@ const TechStack = () => {
       </div>
 
       <Canvas
-        shadows
+        shadows={!isMobile}
         gl={{ 
-          antialias: true, 
+          antialias: !isMobile, 
           powerPreference: "high-performance", 
           alpha: true,
           stencil: false,
           depth: true
         }}
-        dpr={[1, 2]} // Performance optimization: cap at 2x
+        dpr={isMobile ? [1, 1.5] : [1, 2]} 
         camera={{ position: [0, 0, 55], fov: 40, near: 1, far: 300 }}
         onCreated={({ camera, viewport }) => {
             if (viewport.width < 15) {
@@ -225,7 +227,7 @@ const TechStack = () => {
       >
         <Suspense fallback={null}>
           <ambientLight intensity={1} />
-          <pointLight position={[20, 20, 25]} intensity={3} color="white" castShadow />
+          <pointLight position={[20, 20, 25]} intensity={3} color="white" castShadow={!isMobile} />
           <directionalLight position={[-10, 20, 10]} intensity={1.5} />
           
           <Physics gravity={[0, 0, 0]}>
@@ -243,8 +245,13 @@ const TechStack = () => {
           
           <Environment preset="night" />
           
-          <EffectComposer multisampling={4}>
-            <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} radius={0.4} />
+          <EffectComposer multisampling={isMobile ? 0 : 4}>
+            <Bloom 
+                luminanceThreshold={1} 
+                mipmapBlur 
+                intensity={isMobile ? 0.8 : 1.5} 
+                radius={isMobile ? 0.2 : 0.4} 
+            />
           </EffectComposer>
         </Suspense>
       </Canvas>
